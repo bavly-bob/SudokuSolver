@@ -5,8 +5,8 @@ cell::cell(int boardSize)
         : N(boardSize) , possibilities((1u << N) - 1) 
 {
 
-    if (N == 9 || N == 16 || N == 25)
-        throw std::invalid_argument("Board size must be 9, 16, or 25.");
+    if (N != 9)
+        throw std::invalid_argument("Board size must be 9 for standard Sudoku."); // solve the standard 9x9 Sudoku only
 }
 
 void cell::removePossibility(int num) 

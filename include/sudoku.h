@@ -13,7 +13,7 @@ class SudokuBoard
 {
 private:
     int N; // board size (e.g., 9 for 9x9)
-    std::vector<std::vector<Cell>> grid; // 2D grid of Cells
+    std::vector<std::vector<cell>> grid; // 2D grid of Cells
 public:
     explicit SudokuBoard(int boardSize = 9);
     
