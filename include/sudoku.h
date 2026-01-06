@@ -20,6 +20,6 @@ public:
     bool loadFromString(const std::string& puzzle); // load puzzle from string
     void print() const; // print the board to console
     bool isSolved() const; // check if the board is completely solved
-    void propagateAll(); // perform constraint propagation on the entire board
+    bool propagateAll(); // perform constraint propagation on the entire board
     bool solveWithBacktracking(); // solve the puzzle using backtracking if needed
 };

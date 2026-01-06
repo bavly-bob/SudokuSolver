@@ -18,4 +18,5 @@ public:
     bool isPossible(int num) const; // check if num is possible
     void setValue(int num);         // set cell to a specific value (removes all possibilities except num)
     bool hasOnlyOnePossibility() const; // true if exactly one possibility remains
+    int possibilityCount() const; // count of possible numbers
 };

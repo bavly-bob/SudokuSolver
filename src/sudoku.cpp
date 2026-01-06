@@ -63,58 +63,75 @@ bool SudokuBoard::isSolved() const
     return true;
 }
 
-void SudokuBoard::propagateAll() 
+
+bool SudokuBoard::propagateAll()
 {
     bool changed;
-    do 
+    do
     {
         changed = false;
-        for (int i = 0; i < N; ++i) 
-        {
-            for (int j = 0; j < N; ++j) 
-            {
-                if (grid[i][j].hasOnlyOnePossibility()) 
-                {
-                    int val;
-                    for (int num = 1; num <= N; ++num) 
-                    {
-                        if (grid[i][j].isPossible(num)) 
-                        {
-                            val = num;
-                            break;
-                        }
-                    }
-                    // Remove this value from the same row, column, and box
-                    for (int k = 0; k < N; ++k) 
-                    {
-                        if (k != j) 
-                        {
-                            grid[i][k].removePossibility(val);
-                        }
-                        if (k != i) 
-                        {
-                            grid[k][j].removePossibility(val);
-                        }
-                    }
 
-                    int boxStartRow = (i / 3    ) * 3;
-                    int boxStartCol = (j / 3) * 3;
-                    for (int r = boxStartRow; r < boxStartRow + 3; ++r) 
+        for (int i = 0; i < N; ++i)
+        {
+            for (int j = 0; j < N; ++j)
+            {
+                if (!grid[i][j].hasOnlyOnePossibility())
+                    continue;
+
+                int val = -1;
+                for (int num = 1; num <= N; ++num)
+                {
+                    if (grid[i][j].isPossible(num))
                     {
-                        for (int c = boxStartCol; c < boxStartCol + 3; ++c) 
-                        {
-                            if (r != i || c != j) 
-                            {
-                                grid[r][c].removePossibility(val);
-                            }
-                        }
+                        val = num;
+                        break;
                     }
-                    changed = true;
                 }
+
+                // Eliminate from row
+                for (int k = 0; k < N; ++k)
+                {
+                    if (k != j && grid[i][k].isPossible(val))
+                    {
+                        grid[i][k].removePossibility(val);
+                        changed = true;
+                    }
+                }
+
+                // Eliminate from column
+                for (int k = 0; k < N; ++k)
+                {
+                    if (k != i && grid[k][j].isPossible(val))
+                    {
+                        grid[k][j].removePossibility(val);
+                        changed = true;
+                    }
+                }
+
+                // Eliminate from box
+                int boxStartRow = (i / 3) * 3;
+                int boxStartCol = (j / 3) * 3;
+
+                for (int r = boxStartRow; r < boxStartRow + 3; ++r)
+                    for (int c = boxStartCol; c < boxStartCol + 3; ++c)
+                        if ((r != i || c != j) && grid[r][c].isPossible(val))
+                        {
+                            grid[r][c].removePossibility(val);
+                            changed = true;
+                        }
+                
+                // Check for contradictions
+                for (int r = 0; r < N; ++r)
+                    for (int c = 0; c < N; ++c)   
+                        if (grid[r][c].possibilityCount() == 0)
+                            return false;
             }
         }
     } while (changed);
+
+    return true;
 }
+
 
 bool SudokuBoard::solveWithBacktracking() 
 {

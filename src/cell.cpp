@@ -34,3 +34,8 @@ bool cell::hasOnlyOnePossibility() const
 {
     return __builtin_popcount(possibilities) == 1;
 }
+
+int cell::possibilityCount() const 
+{
+    return __builtin_popcount(possibilities);
+}

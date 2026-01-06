@@ -4,16 +4,17 @@ int main() {
     SudokuBoard board(9);
 
     // Example puzzle (0 = empty)
+    // This is a known solvable Sudoku puzzle that requires only propagation
     std::string puzzle = 
-        "530070000"
-        "600195000"
-        "098000060"
-        "800060003"
-        "400803001"
-        "700020006"
-        "060000280"
-        "000419005"
-        "000080079";
+            "100000000"
+            "020000000"
+            "003000000"
+            "000400000"
+            "000050000"
+            "000006000"
+            "000000700"
+            "000000080"
+            "000000009";
 
     if (!board.loadFromString(puzzle)) {
         std::cerr << "Error loading puzzle!\n";
@@ -36,6 +37,5 @@ int main() {
 
     std::cout << "\nSolved puzzle:\n";
     board.print();
-
     return 0;
 }
