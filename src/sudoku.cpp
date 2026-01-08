@@ -1,25 +1,54 @@
 #include "sudoku.h"
 #include <iostream>
+#include <fstream>
 
 SudokuBoard::SudokuBoard(int boardSize) 
     : N(boardSize), grid(boardSize, std::vector<cell>(boardSize, cell(boardSize))) {}
 
 bool SudokuBoard::loadFromString(const std::string& puzzle) 
 {
-    if (puzzle.length() != N * N) return false;
+    if (puzzle.length() != N * N)
+        return false;
+
+    //  CLEAR BOARD FIRST
+    for (int i = 0; i < N; ++i)
+        for (int j = 0; j < N; ++j)
+            grid[i][j].clear();
+
     for (int i = 0; i < N; ++i) 
     {
         for (int j = 0; j < N; ++j) 
         {
             char ch = puzzle[i * N + j];
             if (ch >= '1' && ch <= '9') 
-            {
-                int num = ch - '0';
-                grid[i][j].setValue(num);
-            }
+                grid[i][j].setValue(ch - '0');
         }
     }
     return true;
+}
+
+
+bool SudokuBoard::loadFromFile(const std::string& filename)
+{
+    std::ifstream file(filename);
+    
+    if (!file.is_open()) return false;
+    
+    std::string line;
+    std::string puzzle;
+    
+    while (std::getline(file, line)) 
+    {
+        for (char ch : line) 
+        {
+            if ((ch >= '0' && ch <= '9') || ch == '.') 
+            {
+                puzzle += ch;
+            }
+        }
+    }
+    file.close();
+    return loadFromString(puzzle);
 }
 
 void SudokuBoard::print() const 
@@ -46,23 +75,17 @@ void SudokuBoard::print() const
         }
         std::cout << std::endl;
     }
+    std::cout << std::endl;
 }
 
-bool SudokuBoard::isSolved() const 
+bool SudokuBoard::isSolved() const
 {
-    for (const auto& row : grid) 
-    {
-        for (const auto& cell : row) 
-        {
-            if (!cell.hasOnlyOnePossibility()) 
-            {
+    for (int i = 0; i < N; ++i)
+        for (int j = 0; j < N; ++j)
+            if (!grid[i][j].hasOnlyOnePossibility())
                 return false;
-            }
-        }
-    }
     return true;
 }
-
 
 bool SudokuBoard::propagateAll()
 {
@@ -133,7 +156,7 @@ bool SudokuBoard::propagateAll()
 }
 
 
-bool SudokuBoard::solveWithBacktracking() 
+bool SudokuBoard::backtracking() 
 {
     // Find the first empty cell
     for (int i = 0; i < N; ++i) 
@@ -149,11 +172,14 @@ bool SudokuBoard::solveWithBacktracking()
                         // Try this number
                         SudokuBoard snapshot = *this; // Save current state
                         grid[i][j].setValue(num);
-                        propagateAll();
-                        if (solveWithBacktracking()) 
+                        
+                        if (!propagateAll()) // If propagation fails 
                         {
-                            return true;
+                            *this = snapshot;
+                            continue; // Try next number
                         }
+                        
+                        if (backtracking()) return true;
                         *this = snapshot; // Restore state
                     }
                 }
@@ -162,4 +188,17 @@ bool SudokuBoard::solveWithBacktracking()
         }
     }
     return isSolved(); // If no empty cells, check if solved
+}
+
+bool SudokuBoard::solve() 
+{
+    if (!propagateAll()) 
+    {
+        return false; // Contradiction found during propagation
+    }
+    if (isSolved()) 
+    {
+        return true; // Solved by propagation alone
+    }
+    return backtracking(); // Use backtracking if needed
 }

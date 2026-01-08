@@ -16,6 +16,7 @@ public:
 
     void removePossibility(int num); // remove a possibility
     bool isPossible(int num) const; // check if num is possible
+    void clear();               // clear all possibilities (reset cell)
     void setValue(int num);         // set cell to a specific value (removes all possibilities except num)
     bool hasOnlyOnePossibility() const; // true if exactly one possibility remains
     int possibilityCount() const; // count of possible numbers

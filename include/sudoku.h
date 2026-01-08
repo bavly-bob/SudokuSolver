@@ -18,8 +18,10 @@ public:
     explicit SudokuBoard(int boardSize = 9);
     
     bool loadFromString(const std::string& puzzle); // load puzzle from string
+    bool loadFromFile(const std::string& filename); // load puzzle from file
     void print() const; // print the board to console
     bool isSolved() const; // check if the board is completely solved
     bool propagateAll(); // perform constraint propagation on the entire board
-    bool solveWithBacktracking(); // solve the puzzle using backtracking if needed
+    bool backtracking(); // solve the puzzle using backtracking if needed
+    bool solve(); // high-level solve function combining propagation and backtracking
 };

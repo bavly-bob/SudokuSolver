@@ -23,6 +23,11 @@ bool cell::isPossible(int num) const
     return possibilities & (1u << (num - 1));
 }
 
+void cell::clear() 
+{
+    possibilities = (1u << N) - 1;
+}
+
 void cell::setValue(int num) 
 {
     if (num < 1 || num > N)
