@@ -2,7 +2,7 @@
 #include <cassert>
 #include <iostream>
 
-void test_easy()
+int main()
 {
     SudokuBoard board;
     bool ok = board.loadFromFile("boards/easy.txt");
@@ -10,6 +10,7 @@ void test_easy()
 
     board.print();
     bool changed = board.propagateAll();
+    std::cout << "After propagation:\n" << std::endl << changed << std::endl;
     board.print();
     changed = board.backtracking() || changed;
     board.print();
