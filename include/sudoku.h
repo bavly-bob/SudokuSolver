@@ -15,8 +15,9 @@ private:
     int N; // board size (e.g., 9 for 9x9)
     std::vector<std::vector<cell>> grid; // 2D grid of Cells
 public:
-    explicit SudokuBoard(int boardSize = 9);
+    explicit SudokuBoard(int boardSize);
     
+    int charToValue(char ch);
     bool loadFromString(const std::string& puzzle); // load puzzle from string
     bool loadFromFile(const std::string& filename); // load puzzle from file
     void print() const; // print the board to console
@@ -35,6 +36,10 @@ public:
     bool advancedRemoveRow(int row, int col, int num);
     bool removeAll(int row, int col, int num);
     bool advancedRemoveAll(int row, int col, int num);
+    // more advanced elminators
+    bool hiddenSingleRow(int row);
+    bool hiddenSingleCol(int col);
+    bool hiddenSingleBox(int row, int col);
 
     bool propagateAll(); // perform constraint propagation on the entire board
     bool backtracking(); // solve the puzzle using backtracking if needed

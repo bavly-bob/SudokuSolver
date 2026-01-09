@@ -1,56 +1,74 @@
 #include "sudoku.h"
 #include <iostream>
 #include <fstream>
+#include <cassert>
+#include <stdexcept>
 
 SudokuBoard::SudokuBoard(int boardSize) 
     : N(boardSize), grid(boardSize, std::vector<cell>(boardSize, cell(boardSize))) {}
 
-bool SudokuBoard::loadFromString(const std::string& puzzle) 
+bool SudokuBoard::loadFromString(const std::string& puzzle)
 {
     if (puzzle.length() != N * N)
         return false;
 
-    //  CLEAR BOARD FIRST
+    // Clear board first
     for (int i = 0; i < N; ++i)
         for (int j = 0; j < N; ++j)
             grid[i][j].clear();
 
-    for (int i = 0; i < N; ++i) 
+    for (int i = 0; i < N; ++i)
     {
-        for (int j = 0; j < N; ++j) 
+        for (int j = 0; j < N; ++j)
         {
             char ch = puzzle[i * N + j];
-            if (ch >= '1' && ch <= '9') 
-                grid[i][j].setValue(ch - '0');
+
+            int value = charToValue(ch);
+
+            if (value < 0 || value > N)
+                return false; // invalid character for this board size
+
+            if (value != 0)
+                grid[i][j].setValue(value);
         }
     }
+
     removePossibilitiesAfterInit();
     return true;
 }
 
+int SudokuBoard::charToValue(char ch)
+{
+    if (ch >= '1' && ch <= '9') return ch - '0';
+    else if (ch >= 'A' && ch <= 'Z') return ch - 'A' + 10;
+    else if (ch >= 'a' && ch <= 'z') return ch - 'a' + 10;
+    else if (ch == '.' || ch == '0') return 0;
+    else throw std::runtime_error("Invalid character");
+}
 
 bool SudokuBoard::loadFromFile(const std::string& filename)
 {
     std::ifstream file(filename);
-    
     if (!file.is_open()) return false;
-    
-    std::string line;
-    std::string puzzle;
-    
-    while (std::getline(file, line)) 
+    std::string line, puzzle;
+
+    while (std::getline(file, line))
     {
-        for (char ch : line) 
+        for (char ch : line)
         {
-            if ((ch >= '0' && ch <= '9') || ch == '.') 
+            if ((ch >= '0' && ch <= '9') || // digits
+                (ch >= 'A' && ch <= 'Z') || // uppercase letters, for boards larger than 9x9
+                (ch >= 'a' && ch <= 'z') || // lowercase letters, for boards larger than 9x9
+                ch == '.') // empty cells
             {
                 puzzle += ch;
             }
         }
     }
-    file.close();
+
     return loadFromString(puzzle);
 }
+
 
 void SudokuBoard::clear() 
 {
@@ -65,7 +83,7 @@ void SudokuBoard::print() const
     {
         for (int j = 0; j < N; ++j) 
         {
-            std::cout << grid[i][j].getValue()<< " ";
+            std::cout << grid[i][j].getValue()<< "  ";
         }
         std::cout << std::endl;
     }
@@ -135,6 +153,8 @@ bool SudokuBoard::isSolved() const
 
 void SudokuBoard::removePossibilitiesAfterInit()
 {
+    if(!isConsistent()) throw std::runtime_error("Invalid Sudoku board");
+    
     for (int i = 0; i < N; ++i)
     {
         for (int j = 0; j < N; ++j)
@@ -213,10 +233,8 @@ bool SudokuBoard::advancedRemoveCol(int row, int col, int num)
     // Remove from the same column OUTSIDE the box
     bool changed = false;
     for (int r = 0; r < N; ++r)
-    {
         if (r < boxStartRow || r >= boxStartRow + root)
             changed |= grid[r][restrictedCol].removePossibility(num);
-    }
 
     return changed;
 }
@@ -245,14 +263,10 @@ bool SudokuBoard::advancedRemoveRow(int row, int col, int num)
     // Remove from the same row OUTSIDE the box
     bool changed = false;
     for (int c = 0; c < N; ++c)
-    {
         if (c < boxStartCol || c >= boxStartCol + root)
             changed |= grid[restrictedRow][c].removePossibility(num);
-    }
-
     return changed;
 }
-
 
 bool SudokuBoard::advancedRemoveAll(int row, int col, int num)
 {
@@ -262,13 +276,110 @@ bool SudokuBoard::advancedRemoveAll(int row, int col, int num)
     return changed;
 }
 
+bool SudokuBoard::hiddenSingleCol(int col)
+{
+    bool changed = false;
+
+    for (int num = 1; num <= N; ++num)
+    {
+        int count = 0;
+        int lastRow = -1;
+
+        for (int row = 0; row < N; ++row)
+        {
+            if (grid[row][col].getValue() == 0 &&
+                grid[row][col].isPossible(num))
+            {
+                count++;
+                lastRow = row;
+            }
+        }
+
+        if (count == 1)
+        {
+            grid[lastRow][col].setValue(num);
+            removeAll(lastRow, col, num);
+            changed = true;
+        }
+    }
+    return changed;
+}
+
+bool SudokuBoard::hiddenSingleRow(int row)
+{
+    bool changed = false;
+
+    for (int num = 1; num <= N; ++num)
+    {
+        int count = 0;
+        int lastCol = -1;
+
+        for (int col = 0; col < N; ++col)
+        {
+            if (grid[row][col].getValue() == 0 &&
+                grid[row][col].isPossible(num))
+            {
+                count++;
+                lastCol = col;
+            }
+        }
+
+        if (count == 1)
+        {
+            grid[row][lastCol].setValue(num);
+            removeAll(row, lastCol, num);
+            changed = true;
+        }
+    }
+    return changed;
+}
+
+bool SudokuBoard::hiddenSingleBox(int boxRow, int boxCol)
+{
+    bool changed = false;
+    int root = boxSize();
+
+    for (int num = 1; num <= N; ++num)
+    {
+        int count = 0;
+        int rPos = -1, cPos = -1;
+
+        for (int r = 0; r < root; ++r)
+            for (int c = 0; c < root; ++c)
+            {
+                int rr = boxRow + r;
+                int cc = boxCol + c;
+
+                if (grid[rr][cc].getValue() == 0 &&
+                    grid[rr][cc].isPossible(num))
+                {
+                    count++;
+                    rPos = rr;
+                    cPos = cc;
+                }
+            }
+
+        if (count == 1)
+        {
+            grid[rPos][cPos].setValue(num);
+            removeAll(rPos, cPos, num);
+            changed = true;
+        }
+    }
+    return changed;
+}
+
+
 bool SudokuBoard::propagateAll()
 {
-    bool changed_advanced = false;
-    bool changed_simple = false;
+    bool changed;
+
     do
     {
-        changed_advanced = false;
+        changed = false;
+
+        // 1) Naked singles
+        bool changed_simple;
         do
         {
             changed_simple = false;
@@ -277,40 +388,66 @@ bool SudokuBoard::propagateAll()
             {
                 for (int j = 0; j < N; ++j)
                 {
-                    if (!grid[i][j].hasOnlyOnePossibility() || grid[i][j].getValue() != 0)
+                    if (grid[i][j].getValue() != 0)
                         continue;
 
-                    for(int num = 1; num <= N; ++num)
+                    if (!grid[i][j].hasOnlyOnePossibility())
+                        continue;
+
+                    for (int num = 1; num <= N; ++num)
                     {
-                        if (grid[i][j].isPossible(num) && grid[i][j].getValue() == 0)
+                        if (grid[i][j].isPossible(num))
                         {
-                            grid[i][j].setValue(num); // set the number
+                            grid[i][j].setValue(num);
+                            changed_simple = true;
                             break;
                         }
                     }
-                    int val = grid[i][j].getValue();
 
-                    // remove possibilities from row, column, and box
-                    changed_simple = removeAll(i, j, val);
-                    
-                    // Check for contradictions
+                    int val = grid[i][j].getValue();
+                    removeAll(i, j, val);
+
+                    // contradiction check
                     for (int r = 0; r < N; ++r)
-                        for (int c = 0; c < N; ++c)   
-                            if (grid[r][c].possibilityCount() == 0 && grid[r][c].getValue() == 0)
+                        for (int c = 0; c < N; ++c)
+                            if (grid[r][c].getValue() == 0 &&
+                                grid[r][c].possibilityCount() == 0)
                                 return false;
                 }
             }
+            changed |= changed_simple;
         } while (changed_simple);
-        
-        int root = boxSize();
-        for(int i = 0; i < N; i += root)
-            for(int j = 0; j < N; j += root)
-                for(int k = 1; k <= N; ++k)
-                    changed_advanced |= advancedRemoveAll(i, j, k);
-    } while (changed_advanced);
 
+        // 2) Hidden singles
+        bool changed_hidden = false;
+
+        for (int i = 0; i < N; ++i)
+        {
+            changed_hidden |= hiddenSingleRow(i);
+            changed_hidden |= hiddenSingleCol(i);
+        }
+
+        int root = boxSize();
+        for (int r = 0; r < N; r += root)
+            for (int c = 0; c < N; c += root)
+                changed_hidden |= hiddenSingleBox(r, c);
+
+        changed |= changed_hidden;
+
+        // 3) Pointing pairs / box-line
+        bool changed_advanced = false;
+        for (int r = 0; r < N; r += root)
+            for (int c = 0; c < N; c += root)
+                for (int k = 1; k <= N; ++k)
+                    changed_advanced |= advancedRemoveAll(r, c, k);
+
+        changed |= changed_advanced;
+
+    } while (changed);
+    
     return true;
 }
+
 
 
 bool SudokuBoard::backtracking() 

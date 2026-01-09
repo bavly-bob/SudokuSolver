@@ -13,7 +13,7 @@ private:
     int cellValue;             // current value (0 = empty)
     uint32_t possibilities; // bitmask of possible numbers
 public:
-    explicit cell(int boardSize = 9);
+    explicit cell(int boardSize);
 
     int getValue() const { return cellValue; } // get current cell value
     void setValue(int num);         // set cell to a specific value (removes all possibilities except num)

@@ -4,9 +4,9 @@
 
 int main()
 {
-    SudokuBoard board;
-    board.loadFromFile("boards/medium.txt");
-    assert(board.loadFromFile("boards/medium.txt") && "Failed to load boards/medium.txt");
+    SudokuBoard board(9);
+    bool ok = board.loadFromFile("boards/9x9/medium.txt");
+    assert(ok && "Failed to load boards/9x9/medium.txt");
     board.print();
 
     assert(board.solve());
