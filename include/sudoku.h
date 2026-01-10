@@ -14,6 +14,7 @@ class SudokuBoard
 private:
     int N; // board size (e.g., 9 for 9x9)
     std::vector<std::vector<cell>> grid; // 2D grid of Cells
+    std::vector<Change> log;
 public:
     explicit SudokuBoard(int boardSize);
     
@@ -26,9 +27,15 @@ public:
     bool isConsistent() const; // check if the current board state is valid
     int boxSize() const; // get the size of the boxes (e.g., 3 for 9x9)
     
-    void removePossibilitiesAfterInit(); // setup for the propagation 
-
-    // helper function for elmination of the possibilities
+    // logging functions
+    bool removePossibilityLogged(int r, int c, int num);
+    void assign(int r, int c, int num);
+    void rollback(int checkpoint);
+    bool removeAllLogged(int row, int col, int num);
+    bool propagateAllLogged();
+    bool backtrackingLogged(); // solve the puzzle using backtracking if needed
+    
+    // helper function for further elmination of the possibilities  
     bool removeCol(int col, int num);
     bool removeRow(int row, int num);
     bool removeBox(int row, int col, int num);
@@ -36,12 +43,27 @@ public:
     bool advancedRemoveRow(int row, int col, int num);
     bool removeAll(int row, int col, int num);
     bool advancedRemoveAll(int row, int col, int num);
+
+    // same helper functions for propagation but with logging 
+    bool removeColLogged(int col, int num);
+    bool removeRowLogged(int row, int num);
+    bool removeBoxLogged(int row, int col, int num);
+    bool hiddenSingleRowLogged(int row);
+    bool hiddenSingleColLogged(int col);
+    bool hiddenSingleBoxLogged(int row, int col);
+    bool advancedRemoveColLogged(int boxRow, int boxCol, int num);
+    bool advancedRemoveRowLogged(int boxRow, int boxCol, int num);
+    bool advancedRemoveAllLogged(int boxRow, int boxCol, int num);
+    
+    
+    void removePossibilitiesAfterInit(); // setup for the propagation 
+
     // more advanced elminators
     bool hiddenSingleRow(int row);
     bool hiddenSingleCol(int col);
     bool hiddenSingleBox(int row, int col);
-
+    bool backtracking();
+    bool hasContradiction() const; // check if the board has a contradiction
     bool propagateAll(); // perform constraint propagation on the entire board
-    bool backtracking(); // solve the puzzle using backtracking if needed
     bool solve(); // high-level solve function combining propagation and backtracking
 };

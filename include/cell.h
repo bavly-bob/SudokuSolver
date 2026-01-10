@@ -6,6 +6,13 @@
 #include <cstdint>
 #include <string>
 
+struct Change 
+{
+    int r, c;
+    uint32_t oldPoss;
+    int oldValue;
+};
+
 class cell 
 {
 private:
@@ -17,10 +24,13 @@ public:
 
     int getValue() const { return cellValue; } // get current cell value
     void setValue(int num);         // set cell to a specific value (removes all possibilities except num)
+    uint32_t getPossibilities() const { return possibilities; }
 
-    bool removePossibility(int num); // remove a possibility and return true if the cell value changes
+    bool removePossibility(int num); // remove a possibility and return true if changed
     bool isPossible(int num) const; // check if num is possible
     void clear();               // clear all possibilities (reset cell)
     bool hasOnlyOnePossibility() const; // true if exactly one possibility remains
     int possibilityCount() const; // count of possible numbers
+    int getSinglePossibility() const; // get the single possible value (assumes hasOnlyOnePossibility is true)
+    void restore(uint32_t oldPoss, int oldValue);
 };

@@ -53,3 +53,16 @@ int cell::possibilityCount() const
 {
     return __builtin_popcount(possibilities);
 }
+
+int cell::getSinglePossibility() const
+{
+    // __builtin_ffs returns 1-indexed position of the first set bit
+    // Since we store bit (num-1) for value num, this gives us the value directly
+    return __builtin_ffs(possibilities);
+}
+
+void cell::restore(uint32_t oldPoss, int oldValue)
+{
+    possibilities = oldPoss;
+    cellValue = oldValue;
+}
