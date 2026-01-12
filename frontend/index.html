@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Solver</title>
+    <meta name="description" content="Fast, beautiful Sudoku puzzle solver powered by C++">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>🧩 Sudoku Solver</h1>
+            <p class="subtitle">Lightning-fast solving powered by C++</p>
+        </header>
+
+        <main class="main">
+            <div class="controls">
+                <div class="size-selector">
+                    <label for="size">Board Size</label>
+                    <div class="size-buttons" id="sizeButtons">
+                        <button class="size-btn active" data-size="9">9×9</button>
+                        <button class="size-btn" data-size="16">16×16</button>
+                        <button class="size-btn" data-size="25">25×25</button>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-clear" id="clearBtn">
+                        <span class="icon">🗑️</span> Clear
+                    </button>
+                    <button class="btn btn-solve" id="solveBtn">
+                        <span class="icon">✨</span> Solve
+                    </button>
+                </div>
+            </div>
+
+            <div class="board-container">
+                <div class="board" id="board"></div>
+                <div class="loading-overlay" id="loading">
+                    <div class="spinner"></div>
+                    <span>Solving...</span>
+                </div>
+            </div>
+
+            <div class="result" id="result"></div>
+        </main>
+
+        <footer class="footer">
+            <p>Made with ❤️ using C++ constraint propagation + backtracking</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

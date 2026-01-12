@@ -27,6 +27,9 @@ public:
     bool isConsistent() const; // check if the current board state is valid
     int boxSize() const; // get the size of the boxes (e.g., 3 for 9x9)
     
+    // Cell accessor for API
+    const cell& getCell(int row, int col) const { return grid[row][col]; }
+    
     // logging functions
     bool removePossibilityLogged(int r, int c, int num);
     void assign(int r, int c, int num);

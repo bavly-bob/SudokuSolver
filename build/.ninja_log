@@ -1,0 +1,9 @@
+# ninja log v7
+33	613	7897830236864050	CMakeFiles/server_new.dir/src/cell.cpp.obj	447d3b4b28db1bb6
+15	900	7897830236698611	CMakeFiles/server_new.dir/src/sudoku.cpp.obj	6ac230ef2f69486e
+3	6305	7897830236533098	CMakeFiles/server_new.dir/server.cpp.obj	43c0b6e6663df3bd
+6307	6571	7897830299603995	server_new.exe	e3f465044162c00e
+10	6255	7897830658613084	CMakeFiles/server_new.dir/server.cpp.obj	43c0b6e6663df3bd
+6260	6549	7897830721109413	server_new.exe	e3f465044162c00e
+5	6345	7897842816922415	CMakeFiles/server_new.dir/server.cpp.obj	43c0b6e6663df3bd
+6346	6612	7897842880311150	server_new.exe	e3f465044162c00e

@@ -1,0 +1,3 @@
+C:/Users/baboa/OneDrive - aucegypt.edu/Desktop/New folder/projects/SudokuSolver/build/CMakeFiles/server_new.dir
+C:/Users/baboa/OneDrive - aucegypt.edu/Desktop/New folder/projects/SudokuSolver/build/CMakeFiles/edit_cache.dir
+C:/Users/baboa/OneDrive - aucegypt.edu/Desktop/New folder/projects/SudokuSolver/build/CMakeFiles/rebuild_cache.dir
