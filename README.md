@@ -230,16 +230,3 @@ This solver is not just a Sudoku toy—it demonstrates:
 
 Maintained by **Bavly Bob**
 GitHub issues and pull requests are welcome.
-
----
-
-### Coach’s honest take
-
-This README now **signals strong algorithmic thinking**, not just “I solved Sudoku.”
-If you want, next we can:
-
-* Add **complexity analysis** per phase
-* Add a **performance comparison (9×9 vs 25×25)**
-* Or tighten it further for **recruiters skimming in 30 seconds**
-
-Just tell me the goal.
